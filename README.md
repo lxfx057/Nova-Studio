@@ -40,9 +40,11 @@ npm run build
 npm run preview
 ```
 
-## Salvataggio e privacy
+## Accesso, salvataggio e privacy
 
-I progetti vengono salvati localmente nel browser tramite `localStorage`. Questo significa che non vengono caricati automaticamente su un account cloud e non si sincronizzano da soli tra dispositivi o browser.
+Nova Studio si apre direttamente: non richiede account, registrazione o login. Non usa servizi di autenticazione o database cloud.
+
+I progetti vengono salvati localmente nel browser tramite `localStorage`. Non vengono caricati su un account cloud e non si sincronizzano tra dispositivi o browser. Dal comando **Esci e scarica** puoi scaricare una copia `.NOVA` prima di lasciare l’editor. Puoi anche esportare il backup in qualsiasi momento.
 
 **Consiglio:** esporta regolarmente una copia del progetto e conservala in un posto sicuro. Cancellare i dati del browser può eliminare i progetti salvati localmente.
 
