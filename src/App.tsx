@@ -5,10 +5,10 @@ import {
   FilePlus2, FolderOpen, Globe2, Grid2X2, Image as ImageIcon, Layers, Layout,
   Monitor, MoreHorizontal, MousePointer2, PanelLeftClose, PanelRightClose,
   Plus, Redo2, Rocket, Save, Search, Settings2, Smartphone, Sparkles, Square,
-  Type, Trash2, Undo2, Upload, X
+  Type, Trash2, Undo2, Upload, X, Circle, Video, List, Quote, FormInput, Navigation, UserCircle, Gauge, Star, CheckCircle2, Play, Heart, Menu
 } from 'lucide-react'
 
-type Kind = 'heading' | 'text' | 'button' | 'image' | 'card' | 'divider' | 'spacer'
+type Kind = 'heading' | 'text' | 'button' | 'image' | 'card' | 'divider' | 'spacer' | 'shape' | 'badge' | 'list' | 'quote' | 'input' | 'navbar' | 'avatar' | 'video' | 'progress' | 'icon'
 type Block = { id: string; kind: Kind; label: string; content: string; color: string; background: string; size: number; radius: number; padding: number; align: 'left'|'center'|'right'; width: number }
 type Project = { name: string; blocks: Block[] }
 const STORAGE = 'nova-studio-project-v1'
@@ -21,7 +21,17 @@ const makeBlock = (kind: Kind): Block => {
     image: { label:'Immagine', content:'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1200&q=85', color:'#ffffff', background:'#20283a', size:14, radius:16, padding:0, align:'center', width:100 },
     card: { label:'Card', content:'Un posto per la tua prossima grande idea. Aggiungi contenuti e rendi il tuo progetto unico.', color:'#e9edfa', background:'#171e2d', size:15, radius:18, padding:24, align:'left', width:100 },
     divider: { label:'Separatore', content:'', color:'#343d50', background:'#343d50', size:1, radius:1, padding:8, align:'left', width:100 },
-    spacer: { label:'Spazio', content:'', color:'#ffffff', background:'transparent', size:32, radius:0, padding:0, align:'left', width:100 }
+    spacer: { label:'Spazio', content:'', color:'#ffffff', background:'transparent', size:32, radius:0, padding:0, align:'left', width:100 },
+    shape: { label:'Forma', content:'', color:'#ffffff', background:'#d8dde5', size:120, radius:18, padding:0, align:'center', width:40 },
+    badge: { label:'Badge', content:'Nuovo', color:'#334155', background:'#e2e8f0', size:12, radius:999, padding:9, align:'center', width:25 },
+    list: { label:'Lista', content:'Primo elemento\\nSecondo elemento\\nTerzo elemento', color:'#475569', background:'transparent', size:15, radius:0, padding:8, align:'left', width:100 },
+    quote: { label:'Citazione', content:'Le grandi idee prendono forma quando inizi a costruirle.', color:'#334155', background:'#f1f5f9', size:20, radius:14, padding:24, align:'left', width:100 },
+    input: { label:'Campo input', content:'Inserisci il tuo testo', color:'#334155', background:'#ffffff', size:14, radius:10, padding:13, align:'left', width:100 },
+    navbar: { label:'Navigazione', content:'Home · Progetti · Chi siamo · Contatti', color:'#334155', background:'#f8fafc', size:14, radius:12, padding:18, align:'left', width:100 },
+    avatar: { label:'Avatar', content:'NS', color:'#ffffff', background:'#64748b', size:22, radius:999, padding:18, align:'center', width:18 },
+    video: { label:'Video', content:'https://www.youtube.com/embed/dQw4w9WgXcQ', color:'#ffffff', background:'#0f172a', size:14, radius:14, padding:0, align:'center', width:100 },
+    progress: { label:'Barra progresso', content:'75', color:'#334155', background:'#e2e8f0', size:14, radius:999, padding:5, align:'left', width:100 },
+    icon: { label:'Icona', content:'✦', color:'#475569', background:'transparent', size:48, radius:0, padding:8, align:'center', width:20 }
   }
   return { id:uid(), kind, ...defaults[kind] }
 }
@@ -32,11 +42,21 @@ const initial: Project = { name:'Il mio primo progetto', blocks:[
   { ...makeBlock('image'), id:'hero-image', content:'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1200&q=85' }
 ] }
 const palette: {kind:Kind; title:string; desc:string; icon:any}[] = [
-  {kind:'heading',title:'Titolo',desc:'Titolo e intestazioni',icon:Type},
-  {kind:'text',title:'Testo',desc:'Paragrafo di testo',icon:AlignLeft},
+  {kind:'heading',title:'Titolo',desc:'Titoli e intestazioni',icon:Type},
+  {kind:'text',title:'Testo',desc:'Paragrafi e descrizioni',icon:AlignLeft},
   {kind:'button',title:'Pulsante',desc:'Call to action',icon:MousePointer2},
-  {kind:'image',title:'Immagine',desc:'Immagine da URL',icon:ImageIcon},
+  {kind:'image',title:'Immagine',desc:'Foto e grafiche da URL',icon:ImageIcon},
   {kind:'card',title:'Card',desc:'Contenitore di contenuti',icon:Square},
+  {kind:'shape',title:'Forma',desc:'Forme e superfici',icon:Circle},
+  {kind:'badge',title:'Badge',desc:'Etichette e tag',icon:Star},
+  {kind:'list',title:'Lista',desc:'Elenchi testuali',icon:List},
+  {kind:'quote',title:'Citazione',desc:'Testo in evidenza',icon:Quote},
+  {kind:'input',title:'Campo input',desc:'Campo modulo visuale',icon:FormInput},
+  {kind:'navbar',title:'Navigazione',desc:'Menu e link di pagina',icon:Navigation},
+  {kind:'avatar',title:'Avatar',desc:'Elemento profilo',icon:UserCircle},
+  {kind:'video',title:'Video',desc:'Video incorporato',icon:Video},
+  {kind:'progress',title:'Progresso',desc:'Barra di avanzamento',icon:Gauge},
+  {kind:'icon',title:'Icona',desc:'Simbolo o glifo',icon:Sparkles},
   {kind:'divider',title:'Separatore',desc:'Linea divisoria',icon:MinusIcon},
   {kind:'spacer',title:'Spaziatore',desc:'Spazio verticale',icon:ArrowDown}
 ]
@@ -52,6 +72,15 @@ function renderBlock(b:Block, preview=false) {
   if(b.kind==='button') return <div className="button-wrap" style={{textAlign:b.align}}><button className="preview-button" style={style}>{b.content}</button></div>
   if(b.kind==='image') return <div className="image-wrap" style={{width:b.width+'%',padding:b.padding}}><img src={b.content} alt="Contenuto del progetto" style={{borderRadius:b.radius}} onError={e=>{(e.currentTarget as HTMLImageElement).src='https://placehold.co/1200x600/171e2d/aab4c8?text=Immagine'}} /></div>
   if(b.kind==='card') return <div className="preview-card" style={style}><strong>{b.label==='Card'?'Una nuova possibilità':b.label}</strong><p>{b.content}</p></div>
+  if(b.kind==='shape') return <div style={{width:b.width+'%',height:b.size,background:b.background,borderRadius:b.radius,color:b.color,margin:'4px 0'}} />
+  if(b.kind==='badge') return <div style={{width:b.width+'%',textAlign:b.align}}><span style={{display:'inline-block',background:b.background,color:b.color,borderRadius:b.radius,padding:b.padding,fontSize:b.size,fontWeight:700}}>{b.content}</span></div>
+  if(b.kind==='list') return <ul style={{...style,paddingLeft:28,whiteSpace:'pre-line',lineHeight:1.9,margin:0}}>{b.content.split('\\n').filter(Boolean).map((item,i)=><li key={i}>{item}</li>)}</ul>
+  if(b.kind==='quote') return <blockquote style={{...style,borderLeft:'3px solid #94a3b8',margin:0,fontStyle:'italic',lineHeight:1.6}}>{b.content}</blockquote>
+  if(b.kind==='input') return <div style={{width:b.width+'%'}}><input readOnly placeholder={b.content} style={{width:'100%',padding:b.padding,borderRadius:b.radius,border:'1px solid #cbd5e1',background:b.background,color:b.color,fontSize:b.size}} /></div>
+  if(b.kind==='navbar') return <nav style={{...style,fontWeight:600,display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>{b.content.split('·').map((item,i)=><span key={i}>{item.trim()}</span>)}</nav>
+  if(b.kind==='avatar') return <div style={{width:b.width+'%',textAlign:b.align}}><span style={{display:'inline-grid',placeItems:'center',width:b.size+b.padding*2,height:b.size+b.padding*2,borderRadius:'50%',background:b.background,color:b.color,fontWeight:700,fontSize:b.size}}>{b.content}</span></div>
+  if(b.kind==='video') return <div style={{width:b.width+'%',aspectRatio:'16/9',background:'#0f172a',borderRadius:b.radius,overflow:'hidden',display:'grid',placeItems:'center',color:'#fff'}}><div style={{textAlign:'center'}}><Play size={34}/><small style={{display:'block',marginTop:8}}>Video · {b.content}</small></div></div>
+  if(b.kind==='progress') return <div style={{width:b.width+'%',background:b.background,borderRadius:999,padding:4}}><div style={{height:10,width:Math.min(100,Math.max(0,Number(b.content)||0))+'%',background:'#64748b',borderRadius:999}}/></div>
   if(b.kind==='divider') return <div style={{padding:b.padding+'px 0',width:b.width+'%'}}><div style={{height:1,background:b.background}} /></div>
   return <div style={{height:b.size,width:'100%'}} />
 }
