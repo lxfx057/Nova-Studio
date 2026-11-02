@@ -52,3 +52,6 @@
 .scale-presets{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:8px}
 .scale-presets button{min-width:0;padding:7px 2px;border:1px solid #293246;border-radius:7px;background:#111827;color:#aebbd0;font-size:9px}
 .scale-presets button:hover{border-color:#a8b4c8;color:#f8fafc;background:#202b3b}
+
+.width-presets{margin-top:7px}
+.width-context-note{margin-top:6px;color:#7e8ba1;font-size:9px;line-height:1.4}
