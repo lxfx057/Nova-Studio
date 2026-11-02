@@ -48,3 +48,7 @@
 .smart-guide.y{left:0;right:0;height:1px;background:#ec6b91;box-shadow:0 0 0 1px #ec6b9130}
 .smart-guide.gap{background:#63c6b7}
 @media(max-width:760px){.shape-library{grid-template-columns:repeat(3,minmax(0,1fr));max-height:260px}.shape-option{min-height:62px}.device-indicator{font-size:8px;padding:0 3px}.device-indicator svg{width:13px}}
+
+.scale-presets{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:8px}
+.scale-presets button{min-width:0;padding:7px 2px;border:1px solid #293246;border-radius:7px;background:#111827;color:#aebbd0;font-size:9px}
+.scale-presets button:hover{border-color:#a8b4c8;color:#f8fafc;background:#202b3b}
