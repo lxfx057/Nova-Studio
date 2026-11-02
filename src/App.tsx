@@ -24,7 +24,7 @@ const makeBlock = (kind: Kind): Block => {
     spacer: { label:'Spazio', content:'', color:'#ffffff', background:'transparent', size:32, radius:0, padding:0, align:'left', width:100 },
     shape: { label:'Forma', content:'', color:'#ffffff', background:'#d8dde5', size:120, radius:18, padding:0, align:'center', width:40 },
     badge: { label:'Badge', content:'Nuovo', color:'#334155', background:'#e2e8f0', size:12, radius:999, padding:9, align:'center', width:25 },
-    list: { label:'Lista', content:'Primo elemento\\nSecondo elemento\\nTerzo elemento', color:'#475569', background:'transparent', size:15, radius:0, padding:8, align:'left', width:100 },
+    list: { label:'Lista', content:'Primo elemento\nSecondo elemento\nTerzo elemento', color:'#475569', background:'transparent', size:15, radius:0, padding:8, align:'left', width:100 },
     quote: { label:'Citazione', content:'Le grandi idee prendono forma quando inizi a costruirle.', color:'#334155', background:'#f1f5f9', size:20, radius:14, padding:24, align:'left', width:100 },
     input: { label:'Campo input', content:'Inserisci il tuo testo', color:'#334155', background:'#ffffff', size:14, radius:10, padding:13, align:'left', width:100 },
     navbar: { label:'Navigazione', content:'Home · Progetti · Chi siamo · Contatti', color:'#334155', background:'#f8fafc', size:14, radius:12, padding:18, align:'left', width:100 },
@@ -80,6 +80,7 @@ function renderBlock(b:Block, preview=false) {
   if(b.kind==='navbar') return <nav style={{...style,fontWeight:600,display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>{b.content.split('·').map((item,i)=><span key={i}>{item.trim()}</span>)}</nav>
   if(b.kind==='avatar') return <div style={{width:b.width+'%',textAlign:b.align}}><span style={{display:'inline-grid',placeItems:'center',width:b.size+b.padding*2,height:b.size+b.padding*2,borderRadius:'50%',background:b.background,color:b.color,fontWeight:700,fontSize:b.size}}>{b.content}</span></div>
   if(b.kind==='video') return <div style={{width:b.width+'%',aspectRatio:'16/9',background:'#0f172a',borderRadius:b.radius,overflow:'hidden',display:'grid',placeItems:'center',color:'#fff'}}><div style={{textAlign:'center'}}><Play size={34}/><small style={{display:'block',marginTop:8}}>Video · {b.content}</small></div></div>
+  if(b.kind==='icon') return <div style={{width:b.width+'%',textAlign:b.align,fontSize:b.size,color:b.color,padding:b.padding}}>{b.content}</div>
   if(b.kind==='progress') return <div style={{width:b.width+'%',background:b.background,borderRadius:999,padding:4}}><div style={{height:10,width:Math.min(100,Math.max(0,Number(b.content)||0))+'%',background:'#64748b',borderRadius:999}}/></div>
   if(b.kind==='divider') return <div style={{padding:b.padding+'px 0',width:b.width+'%'}}><div style={{height:1,background:b.background}} /></div>
   return <div style={{height:b.size,width:'100%'}} />
