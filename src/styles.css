@@ -18,3 +18,18 @@
 .selection-tag{background:#64748b}
 .field-label input[type=file]{font-size:10px;color:#94a3b8;max-width:100%}
 @media(max-width:760px){.left-panel{width:min(82vw,310px)}.right-panel{width:min(88vw,340px)}.canvas-scroll{padding:16px 8px}.canvas-toolbar{gap:6px}.canvas-tools{gap:0}.canvas-tools button{width:28px}}
+
+/* NOVA STUDIO — freeform canvas */
+.site-canvas{position:relative;display:block;min-height:1100px;width:100%;padding:0;overflow:visible}
+.canvas-block{position:absolute;top:0;left:0;width:30%;min-height:12px;cursor:grab;touch-action:none;user-select:none;z-index:1}
+.canvas-block:active{cursor:grabbing}
+.canvas-block.is-selected{z-index:20;outline:1px solid #cbd5e1;outline-offset:2px}
+.canvas-block.is-locked{cursor:not-allowed;opacity:.9}
+.canvas-block .selection-tag{pointer-events:none;white-space:nowrap}
+.canvas-add{position:absolute;left:18px;bottom:18px;z-index:30}
+.object-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.object-actions button{min-height:34px;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 5px;background:#151b28;border:1px solid #2b3549;border-radius:7px;color:#aeb8ca;font-size:9px}
+.object-actions button:hover{background:#263244;border-color:#94a3b8;color:#f1f5f9}
+.object-actions button.danger-action{color:#d69a9a}
+.field-label select{background:#0b101a;border:1px solid #293246;border-radius:7px;color:#e6ebf5;padding:9px;font-size:10px;outline:0;width:100%}
+@media(max-width:760px){.site-canvas{min-height:950px}.canvas-block{touch-action:none}.object-actions{grid-template-columns:repeat(2,minmax(0,1fr))}}
