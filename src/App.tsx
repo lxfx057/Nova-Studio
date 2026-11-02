@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 
 type Kind = 'heading' | 'text' | 'button' | 'image' | 'card' | 'divider' | 'spacer' | 'shape' | 'badge' | 'list' | 'quote' | 'input' | 'navbar' | 'avatar' | 'video' | 'progress' | 'icon'
-type ShapeType = 'rectangle'|'rounded'|'circle'|'ellipse'|'triangle'|'triangle-down'|'diamond'|'pentagon'|'hexagon'|'octagon'|'star'|'star6'|'heart'|'arrow'|'chevron'|'plus'|'cross'|'speech'|'cloud'|'moon'|'ring'|'line'|'wave'|'parallelogram'|'trapezoid'|'shield'
+type ShapeType = 'rectangle'|'rounded'|'circle'|'ellipse'|'triangle'|'triangle-down'|'diamond'|'pentagon'|'hexagon'|'octagon'|'star'|'star6'|'heart'|'arrow'|'chevron'|'plus'|'cross'|'speech'|'cloud'|'moon'|'ring'|'line'|'wave'|'parallelogram'|'trapezoid'|'shield'|'none'
 type Block = { id: string; kind: Kind; label: string; content: string; color: string; background: string; size: number; radius: number; padding: number; align: 'left'|'center'|'right'; width: number; x?: number; y?: number; rotation?: number; scale?: number; locked?: boolean; hidden?: boolean; shapeType?: ShapeType; opacity?: number; shadow?: string; borderColor?: string; borderWidth?: number; background2?: string; gradient?: boolean }
 type Project = { name: string; blocks: Block[] }
 const STORAGE = 'nova-studio-project-v1'
