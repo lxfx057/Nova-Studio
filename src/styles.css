@@ -64,3 +64,4 @@
 
 /* Immagini locali: nessun placeholder remoto */
 .image-placeholder{width:100%;min-height:150px;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#202b3b,#111827);border:1px dashed #64748b;color:#aebbd0;font-size:12px;text-align:center}
+\n/* Libreria di preset grafici integrata */\n.design-presets{padding:0 10px 14px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-height:245px;overflow:auto}.design-preset{min-width:0;border:1px solid #293449;border-radius:8px;background:#111827;padding:6px 4px;color:#aebbd0;display:flex;flex-direction:column;align-items:center;gap:6px}.design-preset:hover{border-color:#a5b4fc;background:#202b3b}.design-preset>span{width:34px;height:28px;display:block}.design-preset small{font-size:8px}.field-label .color-row{margin:0}.design-presets::-webkit-scrollbar{width:5px}.design-presets::-webkit-scrollbar-thumb{background:#38465d;border-radius:8px}\n
