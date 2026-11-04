@@ -120,6 +120,49 @@ function renderBlock(b:Block, preview=false) {
   if(b.kind==='divider') return <div style={{padding:b.padding+'px 0',width:b.width+'%'}}><div style={{height:1,background:b.background}} /></div>
   return <div style={{height:b.size,width:'100%'}} />
 }
+
+const safeProjectNumber = (value: unknown, fallback: number, min: number, max: number) =>
+  typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback
+const safeProjectColor = (value: unknown, fallback: string) =>
+  typeof value === 'string' && (/^#[0-9a-f]{3,8}$/i.test(value) || /^(transparent|white|black)$/i.test(value) || /^(rgba?|hsla?)\\([0-9.,%\\s]+\\)$/i.test(value)) ? value : fallback
+const sanitizeImportedBlock = (raw: unknown): Block | null => {
+  if (!raw || typeof raw !== 'object') return null
+  const value = raw as Partial<Block>
+  const kinds: Kind[] = ['heading','text','button','image','card','divider','spacer','shape','badge','list','quote','input','navbar','avatar','video','progress','icon']
+  if (!value.kind || !kinds.includes(value.kind)) return null
+  const base = makeBlock(value.kind)
+  let content = typeof value.content === 'string' ? value.content.slice(0, 10000) : ''
+  if (value.kind === 'image' && content && !/^(https:\\/\\/|data:image\\/(?:png|jpeg|webp|gif|svg\\+xml);base64,)/i.test(content)) content = ''
+  if (value.kind === 'video' && content && !/^https:\\/\\//i.test(content)) content = ''
+  const shapes: ShapeType[] = ['rectangle','rounded','circle','ellipse','triangle','triangle-down','diamond','pentagon','hexagon','octagon','star','star6','heart','arrow','chevron','plus','cross','speech','cloud','moon','ring','line','wave','parallelogram','trapezoid','shield','none']
+  return {
+    ...base,
+    id: uid(),
+    label: (typeof value.label === 'string' ? value.label : base.label).slice(0, 100),
+    content,
+    color: safeProjectColor(value.color, base.color),
+    background: safeProjectColor(value.background, base.background),
+    size: safeProjectNumber(value.size, base.size, 1, 240),
+    radius: safeProjectNumber(value.radius, base.radius, 0, 100),
+    padding: safeProjectNumber(value.padding, base.padding, 0, 160),
+    align: value.align === 'center' || value.align === 'right' ? value.align : 'left',
+    width: safeProjectNumber(value.width, base.width, 1, 100),
+    x: safeProjectNumber(value.x, 40, -10000, 10000),
+    y: safeProjectNumber(value.y, 40, -10000, 10000),
+    rotation: safeProjectNumber(value.rotation, 0, -360, 360),
+    scale: safeProjectNumber(value.scale, 100, 10, 300),
+    locked: Boolean(value.locked),
+    hidden: Boolean(value.hidden),
+    shapeType: value.shapeType && shapes.includes(value.shapeType) ? value.shapeType : 'rectangle',
+    opacity: safeProjectNumber(value.opacity, 100, 0, 100),
+    shadow: typeof value.shadow === 'string' && presetShadows.includes(value.shadow) ? value.shadow : 'none',
+    borderColor: safeProjectColor(value.borderColor, '#ffffff'),
+    borderWidth: safeProjectNumber(value.borderWidth, 0, 0, 20),
+    background2: safeProjectColor(value.background2, base.background),
+    gradient: Boolean(value.gradient)
+  }
+}
+
 function App(){
   const [project,setProject]=useState<Project>(()=>{try{const p=JSON.parse(localStorage.getItem(STORAGE)||'null') as Project|null;return p?.blocks?{...p,blocks:p.blocks.map((b,i)=>({...b,x:b.x??(48+(i%4)*36),y:b.y??(48+Math.floor(i/4)*110),rotation:b.rotation??0,scale:b.scale??100,locked:b.locked??false,hidden:b.hidden??false,shapeType:b.shapeType??'rectangle',opacity:b.opacity??100,shadow:b.shadow??'none',borderColor:b.borderColor??'#ffffff',borderWidth:b.borderWidth??0,background2:b.background2??b.background,gradient:b.gradient??false}))}:initial}catch{return initial}})
   const [selected,setSelected]=useState(project.blocks[0]?.id||'')
@@ -172,7 +215,7 @@ function App(){
   const exportProject=()=>{const files:{name:string;data:string}[]=[{name:'project.nova.json',data:JSON.stringify({format:'NOVA-STUDIO',version:1,...project},null,2)},{name:'README.txt',data:'NOVA STUDIO project archive. Open this .nova file from Nova Studio. SVG files in /figma-import can be imported into Figma individually.'}];project.blocks.forEach((b,i)=>{const label=escapeHtml(b.label);let inner=b.kind==='image'?'<image href="'+escapeHtml(b.content)+'" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"/>':b.kind==='shape'?(b.shapeType==='circle'?'<circle cx="50%" cy="50%" r="48%" fill="'+b.background+'"/>':b.shapeType==='ellipse'?'<ellipse cx="50%" cy="50%" rx="49%" ry="42%" fill="'+b.background+'"/>':b.shapeType==='triangle'?'<polygon points="50,2 98,98 2,98" fill="'+b.background+'"/>':b.shapeType==='line'?'<path d="M2 50 H98" stroke="'+b.background+'" stroke-width="3"/>':b.shapeType==='none'?'':'<rect x="2" y="2" width="96" height="96" rx="'+Math.min(40,b.radius)+'" fill="'+b.background+'"/>'):'<text x="4" y="52" fill="'+b.color+'" font-size="12">'+escapeHtml(b.content)+'</text>';files.push({name:'figma-import/'+String(i+1).padStart(2,'0')+'-'+b.kind+'.svg',data:'<svg xmlns="http://www.w3.org/2000/svg" width="400" height="160" viewBox="0 0 100 100">'+inner+'</svg>'})});const blob=zipStore(files);const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(project.name||'nova-studio').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.nova';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('Archivio NOVA STUDIO esportato')}
   const exitAndDownload=()=>{exportProject();setPreview(false);setShowWelcome(true);setSelected('');notify('Backup scaricato: puoi uscire in sicurezza')}
   const exportHtml=()=>{const body=project.blocks.filter(b=>!b.hidden).map(b=>{const c=escapeHtml(b.content),style='position:absolute;left:'+(b.x??32)+'px;top:'+(b.y??32)+'px;width:'+b.width+'%;color:'+b.color+';background:'+b.background+';font-size:'+b.size+'px;border-radius:'+b.radius+'px;padding:'+b.padding+'px;text-align:'+b.align+';transform:rotate('+(b.rotation??0)+'deg) scale('+( (b.scale??100)/100 )+');';if(b.kind==='image')return '<img alt="'+escapeHtml(b.label)+'" src="'+c+'" style="'+style+'height:auto;max-width:100%">';if(b.kind==='shape'){const shape=b.shapeType||'rectangle';const extra=shape==='circle'?'border-radius:50%;aspect-ratio:1':shape==='ellipse'?'border-radius:50%':shape==='triangle'?'background:transparent!important;width:0!important;height:0;border-left:60px solid transparent;border-right:60px solid transparent;border-bottom:110px solid '+b.background+';padding:0':shape==='line'?'height:2px;padding:0':shape==='none'?'background:transparent!important;border:0':'';return '<div style="'+style+'height:'+b.size+'px;'+extra+'"></div>'}if(b.kind==='divider')return '<hr style="'+style+'border:0;border-top:1px solid '+b.background+'">';if(b.kind==='spacer')return '';if(b.kind==='button')return '<button style="'+style+'border:0;cursor:pointer">'+c+'</button>';if(b.kind==='list')return '<ul style="'+style+'">'+c.split('\n').map(x=>'<li>'+x+'</li>').join('')+'</ul>';if(b.kind==='quote')return '<blockquote style="'+style+'">'+c+'</blockquote>';if(b.kind==='navbar')return '<nav style="'+style+'">'+c.split('·').map(x=>'<span style="margin-right:20px">'+x+'</span>').join('')+'</nav>';if(b.kind==='input')return '<input placeholder="'+c+'" style="'+style+'">';if(b.kind==='avatar')return '<div style="'+style+'border-radius:50%;width:64px;height:64px;display:grid;place-items:center">'+c+'</div>';if(b.kind==='progress')return '<div style="'+style+'height:12px"><div style="height:100%;width:'+Math.min(100,Number(c)||0)+'%;background:#64748b"></div></div>';if(b.kind==='icon'||b.kind==='badge')return '<span style="'+style+'">'+c+'</span>';if(b.kind==='card')return '<section style="'+style+'"><h2>'+escapeHtml(b.label)+'</h2>'+c+'</section>';return '<'+(b.kind==='heading'?'h1':'p')+' style="'+style+'">'+c+'</'+(b.kind==='heading'?'h1':'p')+'>'}).join('');const html='<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHtml(project.name)+'</title><style>*{box-sizing:border-box}body{margin:0;background:#fff;color:#111827;font-family:Inter,system-ui,sans-serif}.nova-canvas{position:relative;width:100%;max-width:1440px;min-height:1100px;margin:auto;overflow:hidden;background:#fff}</style></head><body><main class="nova-canvas">'+body+'</main></body></html>';download('nova-studio-export.html',html,'text/html');notify('Codice HTML esportato')}
-  const importProject=(file?:File)=>{if(!file)return;const readJson=(raw:string)=>{const data=JSON.parse(raw);if(!Array.isArray(data.blocks))throw new Error('invalid');const blocks=data.blocks.map((b:Block,i:number)=>({...b,x:b.x??40,y:b.y??40,rotation:b.rotation??0,locked:b.locked??false,hidden:b.hidden??false,shapeType:b.shapeType??'rectangle',id:b.id||uid()}));commit({name:String(data.name||'Progetto importato'),blocks});setSelected(blocks[0]?.id||'');notify('Progetto NOVA STUDIO importato')};if(file.name.endsWith('.nova')){file.arrayBuffer().then(buf=>{const bytes=new Uint8Array(buf),view=new DataView(buf);let off=0;while(off+30<bytes.length&&view.getUint32(off,true)===0x04034b50){const nameLen=view.getUint16(off+26,true),extraLen=view.getUint16(off+28,true),size=view.getUint32(off+18,true),name=new TextDecoder().decode(bytes.slice(off+30,off+30+nameLen)),dataStart=off+30+nameLen+extraLen;if(name==='project.nova.json'){readJson(new TextDecoder().decode(bytes.slice(dataStart,dataStart+size)));return}off=dataStart+size}notify('Archivio NOVA non valido')}).catch(()=>notify('Impossibile aprire il progetto'))}else{const reader=new FileReader();reader.onload=()=>{try{readJson(String(reader.result))}catch{notify('File progetto non valido')}};reader.readAsText(file)}}
+  const importProject=(file?:File)=>{if(!file)return;if(file.size>10*1024*1024){notify('File troppo grande: massimo 10 MB');return}const readJson=(raw:string)=>{const data=JSON.parse(raw);if(!data||!Array.isArray(data.blocks)||data.blocks.length>250)throw new Error('invalid');const blocks=data.blocks.map(sanitizeImportedBlock);if(blocks.some((b:Block|null)=>!b))throw new Error('invalid');const safeBlocks=blocks as Block[];commit({name:(typeof data.name==='string'?data.name:'Progetto importato').slice(0,80),blocks:safeBlocks});setSelected(safeBlocks[0]?.id||'');notify('Progetto NOVA STUDIO importato')};if(file.name.endsWith('.nova')){file.arrayBuffer().then(buf=>{const bytes=new Uint8Array(buf),view=new DataView(buf);let off=0;while(off+30<bytes.length&&view.getUint32(off,true)===0x04034b50){const nameLen=view.getUint16(off+26,true),extraLen=view.getUint16(off+28,true),size=view.getUint32(off+18,true),name=new TextDecoder().decode(bytes.slice(off+30,off+30+nameLen)),dataStart=off+30+nameLen+extraLen;if(name==='project.nova.json'){readJson(new TextDecoder().decode(bytes.slice(dataStart,dataStart+size)));return}off=dataStart+size}notify('Archivio NOVA non valido')}).catch(()=>notify('Impossibile aprire il progetto'))}else{const reader=new FileReader();reader.onload=()=>{try{readJson(String(reader.result))}catch{notify('File progetto non valido')}};reader.readAsText(file)}}
   const filtered=useMemo(()=>palette.filter(p=>(p.title+' '+p.desc).toLowerCase().includes(query.toLowerCase())),[query])
   const reorder=(target:string)=>{if(!dragId||dragId===target)return;const blocks=[...project.blocks],from=blocks.findIndex(b=>b.id===dragId),to=blocks.findIndex(b=>b.id===target);const [item]=blocks.splice(from,1);blocks.splice(to,0,item);commit({...project,blocks});setDragId(null)}
   return <div className="app-shell">
