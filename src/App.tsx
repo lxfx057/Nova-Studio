@@ -124,7 +124,6 @@ function renderBlock(b:Block, preview=false) {
 const safeProjectNumber = (value: unknown, fallback: number, min: number, max: number) =>
   typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback
 const safeProjectColor = (value: unknown, fallback: string) => typeof value === 'string' && (/^#[0-9a-f]{3,8}$/i.test(value) || /^(transparent|white|black)$/i.test(value) || /^(rgba?|hsla?)\([0-9.,%\s]+\)$/i.test(value)) ? value : fallback
-  typeof value === 'string' && (/^#[0-9a-f]{3,8}$/i.test(value) || /^(transparent|white|black)$/i.test(value) || /^(rgba?|hsla?)\\([0-9.,%\\s]+\\)$/i.test(value)) ? value : fallback
 const sanitizeImportedBlock = (raw: unknown): Block | null => {
   if (!raw || typeof raw !== 'object') return null
   const value = raw as Partial<Block>
