@@ -123,7 +123,7 @@ function renderBlock(b:Block, preview=false) {
 
 const safeProjectNumber = (value: unknown, fallback: number, min: number, max: number) =>
   typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback
-const safeProjectColor = (value: unknown, fallback: string) =>
+const safeProjectColor = (value: unknown, fallback: string) => typeof value === 'string' && (/^#[0-9a-f]{3,8}$/i.test(value) || /^(transparent|white|black)$/i.test(value) || /^(rgba?|hsla?)\([0-9.,%\s]+\)$/i.test(value)) ? value : fallback
   typeof value === 'string' && (/^#[0-9a-f]{3,8}$/i.test(value) || /^(transparent|white|black)$/i.test(value) || /^(rgba?|hsla?)\\([0-9.,%\\s]+\\)$/i.test(value)) ? value : fallback
 const sanitizeImportedBlock = (raw: unknown): Block | null => {
   if (!raw || typeof raw !== 'object') return null
@@ -132,8 +132,8 @@ const sanitizeImportedBlock = (raw: unknown): Block | null => {
   if (!value.kind || !kinds.includes(value.kind)) return null
   const base = makeBlock(value.kind)
   let content = typeof value.content === 'string' ? value.content.slice(0, 10000) : ''
-  if (value.kind === 'image' && content && !/^(https:\\/\\/|data:image\\/(?:png|jpeg|webp|gif|svg\\+xml);base64,)/i.test(content)) content = ''
-  if (value.kind === 'video' && content && !/^https:\\/\\//i.test(content)) content = ''
+  if (value.kind === 'image' && content && !/^(https:\/\/|data:image\/(?:png|jpeg|webp|gif|svg\+xml);base64,)/i.test(content)) content = ''
+  if (value.kind === 'video' && content && !/^https:\/\//i.test(content)) content = ''
   const shapes: ShapeType[] = ['rectangle','rounded','circle','ellipse','triangle','triangle-down','diamond','pentagon','hexagon','octagon','star','star6','heart','arrow','chevron','plus','cross','speech','cloud','moon','ring','line','wave','parallelogram','trapezoid','shield','none']
   return {
     ...base,
